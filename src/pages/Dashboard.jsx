@@ -9,14 +9,15 @@ import {
   Calendar, 
   Award, 
   ArrowUpRight, 
-  CheckCircle2, 
-  AlertCircle,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Download,
+  CheckCircle2
 } from 'lucide-react';
 
 export const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('This Month');
+  const [downloading, setDownloading] = useState(false);
 
   // Stats data with modern gradients & icons
   const stats = [
@@ -71,6 +72,49 @@ export const Dashboard = () => {
     { title: 'Mid-Term Examinations Begin', date: 'Nov 05, 2026', badge: 'Exam', color: 'bg-amber-100 text-amber-700' },
   ];
 
+  // REAL WORKING REPORT DOWNLOAD HANDLER
+  const handleGenerateReport = () => {
+    setDownloading(true);
+    
+    setTimeout(() => {
+      const reportContent = `=========================================
+M.E FOUNDATIONS SCHOOL - EXECUTIVE REPORT
+=========================================
+Generated On: ${new Date().toLocaleDateString()} (${new Date().toLocaleTimeString()})
+Selected Period: ${selectedPeriod}
+Portal Version: v2.5 (Enterprise Edition)
+
+[INSTITUTIONAL METRICS]
+- Total Enrolled Students: 2,450 (Growth: +12%)
+- Active Faculty Members: 142
+- Monthly Fee Collection: $84,200 (94% Collection Rate)
+- Active Operational Courses: 38
+
+[RECENT CAMPUS LOGS]
+1. New student admission: Sarah Jenkins (Grade 10) - Success
+2. Monthly tuition fee submitted for Class 8B - Completed
+3. Physics Mid-Term Exam schedule published - Notice
+4. Teacher attendance verified for morning shift - Verified
+
+-----------------------------------------
+Authorized by System Administrator
+M.E ERP Portal • Secured via Vercel Edge
+=========================================`;
+
+      const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ME_Foundations_Executive_Report_${new Date().toISOString().slice(0,10)}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      setDownloading(false);
+    }, 600);
+  };
+
   return (
     <div className="space-y-8 pb-12 animate-fadeIn">
       
@@ -96,15 +140,25 @@ export const Dashboard = () => {
             <select 
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="bg-slate-800/80 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-inner"
+              className="bg-slate-800/80 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-inner cursor-pointer"
             >
               <option>This Week</option>
               <option>This Month</option>
               <option>This Academic Year</option>
             </select>
-            <button className="bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-medium px-5 py-2.5 rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2">
-              <span>Generate Report</span>
-              <ArrowUpRight className="w-4 h-4" />
+            <button 
+              onClick={handleGenerateReport}
+              disabled={downloading}
+              className="bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-medium px-5 py-2.5 rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {downloading ? (
+                <span>Generating...</span>
+              ) : (
+                <>
+                  <span>Generate Report</span>
+                  <Download className="w-4 h-4" />
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -157,7 +211,7 @@ export const Dashboard = () => {
 
             <div className="space-y-4">
               {recentActivities.map((act) => (
-                <div key={act.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/80 hover:bg-slate-100/80 transition border border-slate-100">
+                <div key={act.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/85 hover:bg-slate-100/80 transition border border-slate-100">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shadow-sm">
                       {act.title.charAt(0)}
