@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Mail, Lock, Sparkles, Chrome, Globe } from 'lucide-react';
@@ -7,12 +7,18 @@ export const Login = () => {
   const [email, setEmail] = useState('admin@esylearning.com');
   const [password, setPassword] = useState('ChangeMe123!');
   const [role, setRole] = useState('Super Admin');
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Jab bhi login page khule, purana session clear kar dein taake direct login page hi dikhe
+  useEffect(() => {
+    if (typeof logout === 'function') {
+      logout();
+    }
+  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Role ke mutabiq user login object pass karein
     login({ email, role, name: role === 'Student' ? 'Sarah Jenkins' : role === 'Teacher' ? 'Dr. Robert Smith' : 'System Administrator' });
     navigate('/');
   };
@@ -24,13 +30,11 @@ export const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative Blur Backgrounds */}
       <div className="absolute -left-20 -top-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="bg-white/95 backdrop-blur-xl rounded-3xl max-w-md w-full p-8 shadow-2xl border border-white/20 relative z-10 animate-fadeIn">
         
-        {/* Brand Header */}
         <div className="text-center space-y-3 mb-8">
           <div className="w-14 h-14 bg-gradient-to-tr from-emerald-600 to-teal-500 rounded-2xl mx-auto flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-emerald-600/30">
             ME
@@ -41,12 +45,11 @@ export const Login = () => {
           </div>
         </div>
 
-        {/* Social SSO Logins */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <button 
             type="button" 
             onClick={() => handleSocialLogin('Google')}
-            className="flex items-center justify-center gap-2.5 py-2.5 px-4 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+            className="flex items-center justify-center gap-2.5 py-2.5 px-4 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm cursor-pointer"
           >
             <Chrome className="w-4 h-4 text-blue-600" />
             <span>Google SSO</span>
@@ -54,7 +57,7 @@ export const Login = () => {
           <button 
             type="button" 
             onClick={() => handleSocialLogin('Microsoft')}
-            className="flex items-center justify-center gap-2.5 py-2.5 px-4 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+            className="flex items-center justify-center gap-2.5 py-2.5 px-4 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm cursor-pointer"
           >
             <Globe className="w-4 h-4 text-sky-600" />
             <span>Microsoft</span>
@@ -67,7 +70,6 @@ export const Login = () => {
           <div className="flex-grow border-t border-slate-200"></div>
         </div>
 
-        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Email / Username</label>
@@ -115,14 +117,13 @@ export const Login = () => {
 
           <button 
             type="submit"
-            className="w-full mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2"
+            className="w-full mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Sign In to Portal</span>
             <Sparkles className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Demo Footer credentials note */}
         <div className="mt-6 pt-4 border-t border-slate-100 text-center">
           <p className="text-slate-400 text-xs">
             Demo Access Credentials:<br />
