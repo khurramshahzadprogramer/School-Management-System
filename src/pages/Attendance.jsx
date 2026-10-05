@@ -1,98 +1,76 @@
-import React, { createContext, useContext, useState } from 'react';
-import { getStorage, setStorage } from '../utils/storage';
-import { initialStudents, initialTeachers, initialFees, initialNotices, initialActivities } from '../data/students';
+import React from 'react';
+import { useSchool } from '../context/AuthContext';
+import { CheckSquare, Users, Calendar } from 'lucide-react';
 
-const AuthContext = createContext();
-const SchoolContext = createContext();
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => getStorage('auth_user', null));
-  const [toast, setToast] = useState(null);
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
-  };
-
-  // Improved login to handle both object parameters or individual arguments
-  const login = (emailOrObj, password, roleArg) => {
-    let loggedUser;
-    
-    if (typeof emailOrObj === 'object' && emailOrObj !== null) {
-      // Object passed from Login component: { email, role, name }
-      loggedUser = {
-        email: emailOrObj.email || 'admin@esylearning.com',
-        role: emailOrObj.role || 'Super Admin',
-        name: emailOrObj.name || (emailOrObj.role === 'Student' ? 'Sarah Jenkins' : emailOrObj.role === 'Teacher' ? 'Dr. Robert Smith' : 'System Administrator')
-      };
-    } else {
-      // Individual arguments passed: (email, password, role)
-      const role = roleArg || 'Super Admin';
-      loggedUser = {
-        email: emailOrObj,
-        role,
-        name: role === 'Super Admin' ? 'System Administrator' : role === 'Teacher' ? 'Dr. Salman Akram' : 'Ahmed Khan'
-      };
-    }
-
-    setUser(loggedUser);
-    setStorage('auth_user', loggedUser);
-    showToast(`Welcome back, ${loggedUser.name} (${loggedUser.role})!`, 'success');
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('me_school_auth_user');
-    showToast('Logged out successfully.', 'info');
-  };
+export const Attendance = () => {
+  const { students } = useSchool();
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, toast, showToast }}>
-      {children}
-    </AuthContext.Provider>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Attendance Management</h1>
+          <p className="text-slate-400 text-sm">Track and monitor student daily attendance records.</p>
+        </div>
+        <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 text-slate-300 text-sm">
+          <Calendar className="w-4 h-4 text-emerald-500" />
+          <span>{new Date().toLocaleDateString()}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-slate-400 text-sm font-medium">Total Students</h3>
+            <Users className="w-5 h-5 text-emerald-500" />
+          </div>
+          <p className="text-3xl font-bold text-white">{students?.length || 0}</p>
+        </div>
+        <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-slate-400 text-sm font-medium">Present Today</h3>
+            <CheckSquare className="w-5 h-5 text-teal-500" />
+          </div>
+          <p className="text-3xl font-bold text-white">{students?.length ? students.length - 1 : 0}</p>
+        </div>
+        <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-slate-400 text-sm font-medium">Absent Today</h3>
+            <Users className="w-5 h-5 text-rose-500" />
+          </div>
+          <p className="text-3xl font-bold text-white">1</p>
+        </div>
+      </div>
+
+      <div className="bg-slate-950 rounded-2xl border border-slate-900 p-6">
+        <h3 className="text-white font-bold mb-4">Student Attendance List</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-300">
+            <thead className="bg-slate-900 text-slate-400 uppercase text-xs">
+              <tr>
+                <th className="p-3 rounded-l-xl">Name</th>
+                <th className="p-3">Roll No</th>
+                <th className="p-3">Class</th>
+                <th className="p-3 rounded-r-xl">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-900">
+              {students?.map((student, idx) => (
+                <tr key={idx} className="hover:bg-slate-900/50">
+                  <td className="p-3 font-medium text-white">{student.name || student.fullName || 'Student'}</td>
+                  <td className="p-3 text-slate-400">{student.rollNo || `#STD-00${idx+1}`}</td>
+                  <td className="p-3 text-slate-400">{student.class || '10th'}</td>
+                  <td className="p-3">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Present
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 };
-
-export const SchoolProvider = ({ children }) => {
-  const [students, setStudents] = useState(() => getStorage('students', initialStudents));
-  const [teachers, setTeachers] = useState(() => getStorage('teachers', initialTeachers));
-  const [fees, setFees] = useState(() => getStorage('fees', initialFees));
-  const [notices, setNotices] = useState(() => getStorage('notices', initialNotices));
-  const [activities, setActivities] = useState(() => getStorage('activities', initialActivities));
-
-  const updateStudents = (newStudents) => {
-    setStudents(newStudents);
-    setStorage('students', newStudents);
-  };
-
-  const updateTeachers = (newTeachers) => {
-    setTeachers(newTeachers);
-    setStorage('teachers', newTeachers);
-  };
-
-  const updateFees = (newFees) => {
-    setFees(newFees);
-    setStorage('fees', newFees);
-  };
-
-  const updateNotices = (newNotices) => {
-    setNotices(newNotices);
-    setStorage('notices', newNotices);
-  };
-
-  const addActivity = (action, user) => {
-    const newAct = { id: Date.now(), action, user, time: 'Just now' };
-    const updated = [newAct, ...activities];
-    setActivities(updated);
-    setStorage('activities', updated);
-  };
-
-  return (
-    <SchoolContext.Provider value={{ students, updateStudents, teachers, updateTeachers, fees, updateFees, notices, updateNotices, activities, addActivity }}>
-      {children}
-    </SchoolContext.Provider>
-  );
-};
-
-export const useAuth = () => useContext(AuthContext);
-export const useSchool = () => useContext(SchoolContext);

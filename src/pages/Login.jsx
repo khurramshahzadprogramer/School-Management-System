@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Mail, Lock, Sparkles, Chrome, Globe } from 'lucide-react';
-
+import { Shield, Mail, Lock, Sparkles, Globe } from 'lucide-react';
 export const Login = () => {
   const [email, setEmail] = useState('admin@esylearning.com');
   const [password, setPassword] = useState('ChangeMe123!');
