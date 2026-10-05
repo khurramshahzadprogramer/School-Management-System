@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, Users, GraduationCap, DollarSign, 
   BookOpen, Calendar, Bell, Search, Plus, CheckCircle, 
-  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, X, Check
+  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, X 
 } from 'lucide-react';
 
 export default function App() {
@@ -16,13 +16,28 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Interactive Students Data State
-  const [students, setStudents] = useState([
-    { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
-    { id: 'REG-2026-02', name: 'Fatima Noor', grade: 'Grade 10 - B', status: 'Pending', contact: '+92 321 9876543' },
-    { id: 'REG-2026-03', name: 'Zainab Khan', grade: 'Grade 9 - A', status: 'Paid', contact: '+92 333 5554433' },
-    { id: 'REG-2026-04', name: 'Bilal Raza', grade: 'Grade 8 - C', status: 'Paid', contact: '+92 312 4455667' },
-  ]);
+  // Interactive Students Data with LocalStorage Persistence
+  const [students, setStudents] = useState(() => {
+    const savedStudents = localStorage.getItem('meschool_students_v1');
+    if (savedStudents) {
+      try {
+        return JSON.parse(savedStudents);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return [
+      { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
+      { id: 'REG-2026-02', name: 'Fatima Noor', grade: 'Grade 10 - B', status: 'Pending', contact: '+92 321 9876543' },
+      { id: 'REG-2026-03', name: 'Zainab Khan', grade: 'Grade 9 - A', status: 'Paid', contact: '+92 333 5554433' },
+      { id: 'REG-2026-04', name: 'Bilal Raza', grade: 'Grade 8 - C', status: 'Paid', contact: '+92 312 4455667' },
+    ];
+  });
+
+  // Save to LocalStorage whenever students list changes
+  useEffect(() => {
+    localStorage.setItem('meschool_students_v1', JSON.stringify(students));
+  }, [students]);
 
   // Quick Admission Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +57,7 @@ export default function App() {
     }
   };
 
-  // Handle Add Student Form Submit
+  // Handle Add Student
   const handleAddStudent = (e) => {
     e.preventDefault();
     if (newStudentName && newStudentContact) {
@@ -91,7 +106,7 @@ export default function App() {
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
                   required
                 />
               </div>
@@ -105,7 +120,7 @@ export default function App() {
                   type="password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
                   required
                 />
               </div>
@@ -124,7 +139,7 @@ export default function App() {
     );
   }
 
-  // Render Dynamic Tabs Content
+  // Render Dynamic Tabs
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -137,17 +152,17 @@ export default function App() {
                 </span>
                 <h2 className="text-3xl font-bold tracking-tight">Welcome back, Administrator 👋</h2>
                 <p className="text-slate-300 text-sm max-w-2xl">
-                  Here is your institutional overview for today. Total registered students: <strong className="text-white">{students.length}</strong> active profiles.
+                  Total active student profiles registered in system: <strong className="text-white">{students.length}</strong>
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { title: 'Total Students Enrolled', value: students.length + 2836, change: '+14% this month', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-                { title: 'Active Faculty Members', value: '148', change: 'Fully Verified', icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                { title: 'Monthly Fee Collection', value: '$92,450', change: '94% Collected', icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
-                { title: 'System Security Status', value: 'Secure', change: 'SSL & Firewall Active', icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50' },
+                { title: 'Total Students', value: students.length + 2836, change: 'Live Synced', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                { title: 'Active Faculty', value: '148', change: 'Verified', icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                { title: 'Fee Collection', value: '$92,450', change: '94%', icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
+                { title: 'Security Status', value: 'Secure', change: 'Active', icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50' },
               ].map((stat, index) => {
                 const Icon = stat.icon;
                 return (
@@ -218,70 +233,26 @@ export default function App() {
         );
 
       case 'teachers':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Faculty Management</h3>
-            <p className="text-xs text-slate-500">Manage teachers, departmental assignments, and schedules</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Faculty Management</h3></div>;
       case 'fees':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Fee Collection & Ledger</h3>
-            <p className="text-xs text-slate-500">Track monthly vouchers, bank receipts, and payment statuses</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Fee Collection</h3></div>;
       case 'attendance':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Daily Attendance Logs</h3>
-            <p className="text-xs text-slate-500">Biometric and RFID attendance tracking system</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Attendance Logs</h3></div>;
       case 'academics':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Academics & Examination Portal</h3>
-            <p className="text-xs text-slate-500">Manage term syllabi, question papers, and report cards</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Academics & Exams</h3></div>;
       case 'transport':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Transport & Fleet Tracking</h3>
-            <p className="text-xs text-slate-500">Live GPS tracking for school buses and route assignments</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Transport & Fleet</h3></div>;
       case 'library':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Library Book Inventory</h3>
-            <p className="text-xs text-slate-500">Catalog management, issue logs, and book returns</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Library System</h3></div>;
       case 'notices':
-        return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Notices & Circulars Board</h3>
-            <p className="text-xs text-slate-500">Broadcast official announcements to parents, students, and faculty</p>
-          </div>
-        );
-
+        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Notices & Events</h3></div>;
       default:
-        return <div>Select a tab from the sidebar.</div>;
+        return <div>Select tab</div>;
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex font-sans">
-      
-      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex">
         <div>
           <div className="p-6 border-b border-slate-100 flex items-center space-x-3">
@@ -313,9 +284,7 @@ export default function App() {
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
@@ -327,16 +296,6 @@ export default function App() {
         </div>
 
         <div className="p-4 border-t border-slate-100 space-y-3">
-          <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-            <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
-              AK
-            </div>
-            <div className="overflow-hidden flex-1">
-              <p className="text-sm font-semibold text-slate-900 truncate">Admin Khurram</p>
-              <p className="text-xs text-slate-500 truncate">admin@meschool.edu</p>
-            </div>
-          </div>
-
           <button 
             onClick={() => setIsLoggedIn(false)}
             className="w-full flex items-center justify-center space-x-2 text-rose-600 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-bold transition-all border border-rose-100"
@@ -347,7 +306,6 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center space-x-4 w-96">
@@ -356,7 +314,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Search students, teachers, fees..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -383,19 +341,16 @@ export default function App() {
         </div>
       </main>
 
-      {/* Quick Admission Modal Popup */}
+      {/* Quick Admission Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h3 className="font-bold text-lg text-slate-900">Quick Student Admission</h3>
                 <p className="text-xs text-slate-500">Enter details to register a new student</p>
               </div>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-all"
-              >
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -408,7 +363,7 @@ export default function App() {
                   placeholder="e.g. Daniyal Khan"
                   value={newStudentName}
                   onChange={(e) => setNewStudentName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
                   required
                 />
               </div>
@@ -418,7 +373,7 @@ export default function App() {
                 <select 
                   value={newStudentGrade}
                   onChange={(e) => setNewStudentGrade(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
                 >
                   <option value="Grade 10 - A">Grade 10 - A</option>
                   <option value="Grade 10 - B">Grade 10 - B</option>
@@ -428,23 +383,23 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Parent / Guardian Contact</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Parent Contact</label>
                 <input 
                   type="text"
                   placeholder="+92 300 0000000"
                   value={newStudentContact}
                   onChange={(e) => setNewStudentContact(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Initial Fee Status</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Fee Status</label>
                 <select 
                   value={newStudentStatus}
                   onChange={(e) => setNewStudentStatus(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
                 >
                   <option value="Paid">Paid</option>
                   <option value="Pending">Pending</option>
@@ -455,13 +410,13 @@ export default function App() {
                 <button 
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all"
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700"
                 >
                   Save Admission
                 </button>
@@ -470,7 +425,6 @@ export default function App() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
