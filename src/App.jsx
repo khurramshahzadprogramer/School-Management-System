@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   LayoutDashboard, Users, GraduationCap, DollarSign, 
   BookOpen, Calendar, Bell, Search, Plus, CheckCircle, 
-  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, FileText
+  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, X, Check
 } from 'lucide-react';
 
 export default function App() {
@@ -16,7 +16,22 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Handle Login Form Submit
+  // Interactive Students Data State
+  const [students, setStudents] = useState([
+    { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
+    { id: 'REG-2026-02', name: 'Fatima Noor', grade: 'Grade 10 - B', status: 'Pending', contact: '+92 321 9876543' },
+    { id: 'REG-2026-03', name: 'Zainab Khan', grade: 'Grade 9 - A', status: 'Paid', contact: '+92 333 5554433' },
+    { id: 'REG-2026-04', name: 'Bilal Raza', grade: 'Grade 8 - C', status: 'Paid', contact: '+92 312 4455667' },
+  ]);
+
+  // Quick Admission Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newStudentName, setNewStudentName] = useState('');
+  const [newStudentGrade, setNewStudentGrade] = useState('Grade 10 - A');
+  const [newStudentContact, setNewStudentContact] = useState('');
+  const [newStudentStatus, setNewStudentStatus] = useState('Paid');
+
+  // Handle Login
   const handleLogin = (e) => {
     e.preventDefault();
     if (email && password) {
@@ -27,12 +42,29 @@ export default function App() {
     }
   };
 
-  // 1. LOGIN SCREEN (Agar user logged in nahi hai)
+  // Handle Add Student Form Submit
+  const handleAddStudent = (e) => {
+    e.preventDefault();
+    if (newStudentName && newStudentContact) {
+      const newEntry = {
+        id: `REG-2026-0${students.length + 1}`,
+        name: newStudentName,
+        grade: newStudentGrade,
+        status: newStudentStatus,
+        contact: newStudentContact
+      };
+      setStudents([newEntry, ...students]);
+      setNewStudentName('');
+      setNewStudentContact('');
+      setIsModalOpen(false);
+    }
+  };
+
+  // 1. LOGIN SCREEN
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200/80 p-8 space-y-8">
-          
           <div className="text-center space-y-3">
             <div className="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-white font-bold text-3xl shadow-lg shadow-indigo-200">
               ME
@@ -60,7 +92,6 @@ export default function App() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
-                  placeholder="admin@meschool.edu"
                   required
                 />
               </div>
@@ -75,7 +106,6 @@ export default function App() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
-                  placeholder="••••••••"
                   required
                 />
               </div>
@@ -89,69 +119,39 @@ export default function App() {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          <div className="pt-4 border-t border-slate-100 text-center">
-            <p className="text-xs text-slate-400">Secure Institutional Login • Karachi Board Standard</p>
-          </div>
-
         </div>
       </div>
     );
   }
 
-  // Render Dynamic Content based on Sidebar Tabs
+  // Render Dynamic Tabs Content
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-8">
-            {/* Welcome Banner */}
             <div className="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
-              <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
               <div className="space-y-2 z-10">
                 <span className="text-xs font-semibold uppercase tracking-wider bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full border border-indigo-400/20">
                   Academic Year 2026-2027
                 </span>
                 <h2 className="text-3xl font-bold tracking-tight">Welcome back, Administrator 👋</h2>
                 <p className="text-slate-300 text-sm max-w-2xl">
-                  Here is your institutional overview for today. All student attendance logs, fee gateways, transport GPS trackers, and examination portals are fully operational.
+                  Here is your institutional overview for today. Total registered students: <strong className="text-white">{students.length}</strong> active profiles.
                 </p>
-              </div>
-              
-              <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 z-10">
-                <div className="flex items-center space-x-6 text-sm">
-                  <div>
-                    <span className="text-slate-400 block text-xs">Today's Attendance</span>
-                    <span className="font-bold text-emerald-400 text-base">96.4% Present</span>
-                  </div>
-                  <div className="h-8 w-px bg-white/10"></div>
-                  <div>
-                    <span className="text-slate-400 block text-xs">Pending Fee Dues</span>
-                    <span className="font-bold text-amber-400 text-base">$4,250</span>
-                  </div>
-                  <div className="h-8 w-px bg-white/10 hidden sm:block"></div>
-                  <div className="hidden sm:block">
-                    <span className="text-slate-400 block text-xs">Active Transport Buses</span>
-                    <span className="font-bold text-indigo-300 text-base">14 Routes Live</span>
-                  </div>
-                </div>
-                <button className="bg-white text-slate-900 px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm hover:bg-slate-100 transition-all">
-                  Generate Full Audit Report
-                </button>
               </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { title: 'Total Students Enrolled', value: '2,840', change: '+14% this month', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                { title: 'Total Students Enrolled', value: students.length + 2836, change: '+14% this month', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
                 { title: 'Active Faculty Members', value: '148', change: 'Fully Verified', icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                 { title: 'Monthly Fee Collection', value: '$92,450', change: '94% Collected', icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
                 { title: 'System Security Status', value: 'Secure', change: 'SSL & Firewall Active', icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50' },
               ].map((stat, index) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={index} className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all">
+                  <div key={index} className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-slate-500">{stat.title}</span>
                       <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
@@ -160,76 +160,11 @@ export default function App() {
                     </div>
                     <div className="mt-4 flex items-baseline justify-between">
                       <h3 className="text-2xl font-bold text-slate-900">{stat.value}</h3>
-                      <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                        {stat.change}
-                      </span>
+                      <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">{stat.change}</span>
                     </div>
                   </div>
                 );
               })}
-            </div>
-
-            {/* Recent Activity & Calendar */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-lg">Real-Time Campus Activity</h3>
-                    <p className="text-xs text-slate-500">Live event stream across admissions, finance, and exams</p>
-                  </div>
-                  <button className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg transition-all">
-                    View All Logs
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {[
-                    { title: 'New student admission: Sarah Jenkins (Grade 10-A)', time: '10 mins ago', status: 'Success', color: 'bg-emerald-50 text-emerald-600' },
-                    { title: 'Monthly Tuition Fee submitted by Roll #412', time: '25 mins ago', status: 'Verified', color: 'bg-indigo-50 text-indigo-600' },
-                    { title: 'Biology Mid-Term Question Paper uploaded by Dr. Aris', time: '1 hour ago', status: 'Pending Review', color: 'bg-amber-50 text-amber-600' },
-                    { title: 'Bus Route #4 arrived safely at North Campus terminal', time: '2 hours ago', status: 'Completed', color: 'bg-blue-50 text-blue-600' },
-                  ].map((activity, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100/50 transition-all">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2.5 h-2.5 rounded-full bg-indigo-600"></div>
-                        <div>
-                          <h4 className="text-sm font-medium text-slate-800">{activity.title}</h4>
-                          <span className="text-xs text-slate-400">{activity.time}</span>
-                        </div>
-                      </div>
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${activity.color}`}>
-                        {activity.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                  <h3 className="font-bold text-slate-900 text-lg mb-1">Academic Calendar</h3>
-                  <p className="text-xs text-slate-500 mb-6">Upcoming institutional milestones</p>
-                  <div className="space-y-4">
-                    {[
-                      { date: 'OCT 12', title: 'Science Exhibition 2026', desc: 'Main Auditorium • 10:00 AM' },
-                      { date: 'OCT 18', title: 'Parent-Teacher Meeting', desc: 'All Grade Sections • 2:00 PM' },
-                      { date: 'OCT 25', title: 'First Term Examinations Begin', desc: 'Examination Halls A & B' },
-                    ].map((evt, i) => (
-                      <div key={i} className="flex items-start space-x-4 p-3 rounded-xl border border-slate-100 bg-slate-50">
-                        <div className="bg-indigo-600 text-white font-bold text-xs p-2 rounded-lg text-center min-w-[50px]">
-                          {evt.date}
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-slate-800">{evt.title}</h4>
-                          <p className="text-xs text-slate-500 mt-0.5">{evt.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-                  <span className="text-xs text-slate-400">M.E Foundations ERP System • Enterprise Edition</span>
-                </div>
-              </div>
             </div>
           </div>
         );
@@ -242,7 +177,10 @@ export default function App() {
                 <h3 className="text-xl font-bold text-slate-900">Students Directory</h3>
                 <p className="text-xs text-slate-500">Manage enrolled students, grades, and parent details</p>
               </div>
-              <button className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all">
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
+              >
                 <UserPlus className="w-4 h-4" />
                 <span>Add New Student</span>
               </button>
@@ -260,12 +198,7 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {[
-                    { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
-                    { id: 'REG-2026-02', name: 'Fatima Noor', grade: 'Grade 10 - B', status: 'Pending', contact: '+92 321 9876543' },
-                    { id: 'REG-2026-03', name: 'Zainab Khan', grade: 'Grade 9 - A', status: 'Paid', contact: '+92 333 5554433' },
-                    { id: 'REG-2026-04', name: 'Bilal Raza', grade: 'Grade 8 - C', status: 'Paid', contact: '+92 312 4455667' },
-                  ].map((stu, idx) => (
+                  {students.map((stu, idx) => (
                     <tr key={idx} className="hover:bg-slate-50 transition-all">
                       <td className="p-4 font-semibold text-slate-900">{stu.id}</td>
                       <td className="p-4 font-medium text-slate-800">{stu.name}</td>
@@ -287,34 +220,8 @@ export default function App() {
       case 'teachers':
         return (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-bold text-slate-900">Faculty Management</h3>
-                <p className="text-xs text-slate-500">Manage teachers, departmental assignments, and schedules</p>
-              </div>
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700">Add Teacher</button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { name: 'Dr. Aris Thorne', subject: 'Advanced Mathematics', classes: 'Grade 10 & 11', email: 'aris.thorne@meschool.edu' },
-                { name: 'Prof. Saima Qureshi', subject: 'Organic Chemistry', classes: 'Grade 9 & 10', email: 'saima.q@meschool.edu' },
-                { name: 'Mr. Tariq Jamil', subject: 'Computer Science & AI', classes: 'Grade 8 to 10', email: 'tariq.j@meschool.edu' },
-              ].map((tch, idx) => (
-                <div key={idx} className="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-3">
-                  <div className="w-12 h-12 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center text-lg">
-                    {tch.name.charAt(4)}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900">{tch.name}</h4>
-                    <p className="text-xs text-indigo-600 font-medium">{tch.subject}</p>
-                  </div>
-                  <div className="text-xs text-slate-500 space-y-1 pt-2 border-t border-slate-200/60">
-                    <p>Assigned: {tch.classes}</p>
-                    <p>Email: {tch.email}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h3 className="text-xl font-bold text-slate-900">Faculty Management</h3>
+            <p className="text-xs text-slate-500">Manage teachers, departmental assignments, and schedules</p>
           </div>
         );
 
@@ -323,13 +230,6 @@ export default function App() {
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
             <h3 className="text-xl font-bold text-slate-900">Fee Collection & Ledger</h3>
             <p className="text-xs text-slate-500">Track monthly vouchers, bank receipts, and payment statuses</p>
-            <div className="p-6 bg-indigo-50 border border-indigo-100 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div>
-                <span className="text-xs text-indigo-600 font-semibold uppercase">Total Revenue Collected (October)</span>
-                <h2 className="text-3xl font-bold text-slate-900">$92,450 <span className="text-xs text-emerald-600 font-semibold bg-white px-2 py-0.5 rounded-md ml-2">94% Target Achieved</span></h2>
-              </div>
-              <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:bg-indigo-700">Download Financial Statement</button>
-            </div>
           </div>
         );
 
@@ -338,10 +238,6 @@ export default function App() {
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
             <h3 className="text-xl font-bold text-slate-900">Daily Attendance Logs</h3>
             <p className="text-xs text-slate-500">Biometric and RFID attendance tracking system</p>
-            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
-              <span className="text-sm font-semibold text-emerald-800">Overall School Attendance Today: 96.4%</span>
-              <span className="text-xs text-emerald-600 bg-white px-3 py-1 rounded-lg font-bold">All Gates Operational</span>
-            </div>
           </div>
         );
 
@@ -382,14 +278,12 @@ export default function App() {
     }
   };
 
-  // 2. MAIN ERP DASHBOARD SCREEN (Jab user login ho chuka ho)
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex font-sans">
       
-      {/* Sidebar - Light & Professional */}
+      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex">
         <div>
-          {/* Logo Area */}
           <div className="p-6 border-b border-slate-100 flex items-center space-x-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-100">
               ME
@@ -400,7 +294,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Navigation Links */}
           <nav className="p-4 space-y-1.5">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -433,7 +326,6 @@ export default function App() {
           </nav>
         </div>
 
-        {/* User Profile & Logout Footer */}
         <div className="p-4 border-t border-slate-100 space-y-3">
           <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
             <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
@@ -457,8 +349,6 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        
-        {/* Top Header */}
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center space-x-4 w-96">
             <div className="relative w-full">
@@ -466,7 +356,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Search students, teachers, fees..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -474,22 +364,112 @@ export default function App() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="relative p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+            <button className="relative p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100">
               <Bell className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
             </button>
-            <button className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm shadow-md shadow-indigo-100 hover:bg-indigo-700 transition-all">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm shadow-md shadow-indigo-100 hover:bg-indigo-700 transition-all cursor-pointer"
+            >
               <Plus className="w-4 h-4" />
               <span>Quick Admission</span>
             </button>
           </div>
         </header>
 
-        {/* Dynamic Content View */}
         <div className="p-8 max-w-7xl mx-auto w-full">
           {renderContent()}
         </div>
       </main>
+
+      {/* Quick Admission Modal Popup */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="font-bold text-lg text-slate-900">Quick Student Admission</h3>
+                <p className="text-xs text-slate-500">Enter details to register a new student</p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddStudent} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Student Full Name</label>
+                <input 
+                  type="text"
+                  placeholder="e.g. Daniyal Khan"
+                  value={newStudentName}
+                  onChange={(e) => setNewStudentName(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Grade & Section</label>
+                <select 
+                  value={newStudentGrade}
+                  onChange={(e) => setNewStudentGrade(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                >
+                  <option value="Grade 10 - A">Grade 10 - A</option>
+                  <option value="Grade 10 - B">Grade 10 - B</option>
+                  <option value="Grade 9 - A">Grade 9 - A</option>
+                  <option value="Grade 8 - C">Grade 8 - C</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Parent / Guardian Contact</label>
+                <input 
+                  type="text"
+                  placeholder="+92 300 0000000"
+                  value={newStudentContact}
+                  onChange={(e) => setNewStudentContact(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Initial Fee Status</label>
+                <select 
+                  value={newStudentStatus}
+                  onChange={(e) => setNewStudentStatus(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                >
+                  <option value="Paid">Paid</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex items-center justify-end space-x-3">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
+                >
+                  Save Admission
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
