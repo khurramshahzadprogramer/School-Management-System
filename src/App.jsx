@@ -1,44 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, Users, GraduationCap, DollarSign, 
   BookOpen, Calendar, Bell, Search, Plus, CheckCircle, 
-  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, X 
+  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, X, Check
 } from 'lucide-react';
 
 export default function App() {
+  // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('admin@meschool.edu');
   const [password, setPassword] = useState('admin123');
   const [loginError, setLoginError] = useState('');
 
+  // Dashboard Navigation State
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Students with LocalStorage Persistence
-  const [students, setStudents] = useState(() => {
-    const saved = localStorage.getItem('meschool_students_v2');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { console.error(e); }
-    }
-    return [
-      { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
-      { id: 'REG-2026-02', name: 'Fatima Noor', grade: 'Grade 10 - B', status: 'Pending', contact: '+92 321 9876543' },
-      { id: 'REG-2026-03', name: 'Zainab Khan', grade: 'Grade 9 - A', status: 'Paid', contact: '+92 333 5554433' },
-      { id: 'REG-2026-04', name: 'Bilal Raza', grade: 'Grade 8 - C', status: 'Paid', contact: '+92 312 4455667' },
-    ];
-  });
+  // Interactive Students Data State
+  const [students, setStudents] = useState([
+    { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
+    { id: 'REG-2026-02', name: 'Fatima Noor', grade: 'Grade 10 - B', status: 'Pending', contact: '+92 321 9876543' },
+    { id: 'REG-2026-03', name: 'Zainab Khan', grade: 'Grade 9 - A', status: 'Paid', contact: '+92 333 5554433' },
+    { id: 'REG-2026-04', name: 'Bilal Raza', grade: 'Grade 8 - C', status: 'Paid', contact: '+92 312 4455667' },
+  ]);
 
-  useEffect(() => {
-    localStorage.setItem('meschool_students_v2', JSON.stringify(students));
-  }, [students]);
-
-  // Modal State
+  // Quick Admission Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStudentName, setNewStudentName] = useState('');
   const [newStudentGrade, setNewStudentGrade] = useState('Grade 10 - A');
   const [newStudentContact, setNewStudentContact] = useState('');
   const [newStudentStatus, setNewStudentStatus] = useState('Paid');
 
+  // Handle Login
   const handleLogin = (e) => {
     e.preventDefault();
     if (email && password) {
@@ -49,6 +42,7 @@ export default function App() {
     }
   };
 
+  // Handle Add Student Form Submit
   const handleAddStudent = (e) => {
     e.preventDefault();
     if (newStudentName && newStudentContact) {
@@ -66,6 +60,7 @@ export default function App() {
     }
   };
 
+  // 1. LOGIN SCREEN
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
@@ -96,7 +91,7 @@ export default function App() {
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
                   required
                 />
               </div>
@@ -110,7 +105,7 @@ export default function App() {
                   type="password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
                   required
                 />
               </div>
@@ -129,6 +124,7 @@ export default function App() {
     );
   }
 
+  // Render Dynamic Tabs Content
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -141,17 +137,17 @@ export default function App() {
                 </span>
                 <h2 className="text-3xl font-bold tracking-tight">Welcome back, Administrator 👋</h2>
                 <p className="text-slate-300 text-sm max-w-2xl">
-                  Total active student profiles registered in system: <strong className="text-white">{students.length}</strong>
+                  Here is your institutional overview for today. Total registered students: <strong className="text-white">{students.length}</strong> active profiles.
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { title: 'Total Students', value: students.length + 2830, change: 'Live Synced', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-                { title: 'Active Faculty', value: '148', change: 'Verified', icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                { title: 'Fee Collection', value: '$92,450', change: '94%', icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
-                { title: 'Security Status', value: 'Secure', change: 'Active', icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50' },
+                { title: 'Total Students Enrolled', value: students.length + 2836, change: '+14% this month', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                { title: 'Active Faculty Members', value: '148', change: 'Fully Verified', icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                { title: 'Monthly Fee Collection', value: '$92,450', change: '94% Collected', icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
+                { title: 'System Security Status', value: 'Secure', change: 'SSL & Firewall Active', icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50' },
               ].map((stat, index) => {
                 const Icon = stat.icon;
                 return (
@@ -183,7 +179,7 @@ export default function App() {
               </div>
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 cursor-pointer"
+                className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Add New Student</span>
@@ -223,85 +219,69 @@ export default function App() {
 
       case 'teachers':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
             <h3 className="text-xl font-bold text-slate-900">Faculty Management</h3>
-            <p className="text-sm text-slate-500">Active teachers, department assignments, and schedules.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              {['Sir Kamran Ahmed (Mathematics)', 'Madam Ayesha Khan (Physics)', 'Sir Tariq Jamil (Computer Science)'].map((t, i) => (
-                <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                  <h4 className="font-bold text-slate-800 text-sm">{t}</h4>
-                  <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded mt-2 inline-block">Active Duty</span>
-                </div>
-              ))}
-            </div>
+            <p className="text-xs text-slate-500">Manage teachers, departmental assignments, and schedules</p>
           </div>
         );
 
       case 'fees':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-xl font-bold text-slate-900">Fee Collection & Vouchers</h3>
-            <p className="text-sm text-slate-500">Track monthly tuitions, pending dues, and issue payment reminders.</p>
-            <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-indigo-600 uppercase">Total Collected This Month</span>
-                <h4 className="text-2xl font-bold text-slate-900">$92,450</h4>
-              </div>
-              <button className="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow">Generate Report</button>
-            </div>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">Fee Collection & Ledger</h3>
+            <p className="text-xs text-slate-500">Track monthly vouchers, bank receipts, and payment statuses</p>
           </div>
         );
 
       case 'attendance':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-xl font-bold text-slate-900">Attendance Logs</h3>
-            <p className="text-sm text-slate-500">Daily student and staff attendance overview.</p>
-            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-sm font-medium">
-              ✅ Today's Overall School Attendance: <strong>96.4%</strong> (Present: 2,840 | Absent: 104)
-            </div>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">Daily Attendance Logs</h3>
+            <p className="text-xs text-slate-500">Biometric and RFID attendance tracking system</p>
           </div>
         );
 
       case 'academics':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-xl font-bold text-slate-900">Academics & Term Exams</h3>
-            <p className="text-sm text-slate-500">Syllabus tracking, grading sheets, and examination timetables for 2026.</p>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">Academics & Examination Portal</h3>
+            <p className="text-xs text-slate-500">Manage term syllabi, question papers, and report cards</p>
           </div>
         );
 
       case 'transport':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-xl font-bold text-slate-900">Transport & Fleet Management</h3>
-            <p className="text-sm text-slate-500">School bus routes, driver contacts, and live GPS tracking status.</p>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">Transport & Fleet Tracking</h3>
+            <p className="text-xs text-slate-500">Live GPS tracking for school buses and route assignments</p>
           </div>
         );
 
       case 'library':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-xl font-bold text-slate-900">Library System & Books</h3>
-            <p className="text-sm text-slate-500">Book inventory, issued copies, and student checkouts.</p>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">Library Book Inventory</h3>
+            <p className="text-xs text-slate-500">Catalog management, issue logs, and book returns</p>
           </div>
         );
 
       case 'notices':
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-xl font-bold text-slate-900">Notices & Circulars</h3>
-            <p className="text-sm text-slate-500">Broadcast official announcements to parents and teachers.</p>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-900">Notices & Circulars Board</h3>
+            <p className="text-xs text-slate-500">Broadcast official announcements to parents, students, and faculty</p>
           </div>
         );
 
       default:
-        return <div>Select tab</div>;
+        return <div>Select a tab from the sidebar.</div>;
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex font-sans">
+      
+      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex">
         <div>
           <div className="p-6 border-b border-slate-100 flex items-center space-x-3">
@@ -332,8 +312,10 @@ export default function App() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer ${
-                    isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
@@ -345,9 +327,19 @@ export default function App() {
         </div>
 
         <div className="p-4 border-t border-slate-100 space-y-3">
+          <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
+              AK
+            </div>
+            <div className="overflow-hidden flex-1">
+              <p className="text-sm font-semibold text-slate-900 truncate">Admin Khurram</p>
+              <p className="text-xs text-slate-500 truncate">admin@meschool.edu</p>
+            </div>
+          </div>
+
           <button 
             onClick={() => setIsLoggedIn(false)}
-            className="w-full flex items-center justify-center space-x-2 text-rose-600 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-bold transition-all border border-rose-100 cursor-pointer"
+            className="w-full flex items-center justify-center space-x-2 text-rose-600 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-bold transition-all border border-rose-100"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out Session</span>
@@ -355,6 +347,7 @@ export default function App() {
         </div>
       </aside>
 
+      {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center space-x-4 w-96">
@@ -363,7 +356,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Search students, teachers, fees..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -371,7 +364,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="relative p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer">
+            <button className="relative p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100">
               <Bell className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
             </button>
@@ -390,16 +383,19 @@ export default function App() {
         </div>
       </main>
 
-      {/* Quick Admission Modal */}
+      {/* Quick Admission Modal Popup */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-6">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h3 className="font-bold text-lg text-slate-900">Quick Student Admission</h3>
                 <p className="text-xs text-slate-500">Enter details to register a new student</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 cursor-pointer">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-all"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -412,7 +408,7 @@ export default function App() {
                   placeholder="e.g. Daniyal Khan"
                   value={newStudentName}
                   onChange={(e) => setNewStudentName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
                   required
                 />
               </div>
@@ -422,7 +418,7 @@ export default function App() {
                 <select 
                   value={newStudentGrade}
                   onChange={(e) => setNewStudentGrade(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
                 >
                   <option value="Grade 10 - A">Grade 10 - A</option>
                   <option value="Grade 10 - B">Grade 10 - B</option>
@@ -432,23 +428,23 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Parent Contact</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Parent / Guardian Contact</label>
                 <input 
                   type="text"
                   placeholder="+92 300 0000000"
                   value={newStudentContact}
                   onChange={(e) => setNewStudentContact(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Fee Status</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Initial Fee Status</label>
                 <select 
                   value={newStudentStatus}
                   onChange={(e) => setNewStudentStatus(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-slate-800"
                 >
                   <option value="Paid">Paid</option>
                   <option value="Pending">Pending</option>
@@ -459,13 +455,13 @@ export default function App() {
                 <button 
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
                 >
                   Save Admission
                 </button>
@@ -474,6 +470,7 @@ export default function App() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
