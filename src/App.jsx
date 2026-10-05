@@ -2,14 +2,104 @@ import React, { useState } from 'react';
 import { 
   LayoutDashboard, Users, GraduationCap, DollarSign, 
   BookOpen, Calendar, Bell, Search, Plus, CheckCircle, 
-  ShieldCheck, Bus, Library, FileText, UserPlus, Layers
+  ShieldCheck, Bus, Library, UserPlus, Lock, Mail, ArrowRight, LogOut, FileText
 } from 'lucide-react';
 
 export default function App() {
+  // Authentication State
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState('admin@meschool.edu');
+  const [password, setPassword] = useState('admin123');
+  const [loginError, setLoginError] = useState('');
+
+  // Dashboard Navigation State
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Render dynamic content based on active tab
+  // Handle Login Form Submit
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (email && password) {
+      setIsLoggedIn(true);
+      setLoginError('');
+    } else {
+      setLoginError('Please enter valid credentials.');
+    }
+  };
+
+  // 1. LOGIN SCREEN (Agar user logged in nahi hai)
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200/80 p-8 space-y-8">
+          
+          <div className="text-center space-y-3">
+            <div className="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-white font-bold text-3xl shadow-lg shadow-indigo-200">
+              ME
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">M.E Foundations</h1>
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-widest mt-1">School Management ERP v3.0</p>
+            </div>
+            <p className="text-sm text-slate-500">Sign in to access your administrative dashboard</p>
+          </div>
+
+          {loginError && (
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs rounded-xl text-center font-medium">
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-2">Email Address</label>
+              <div className="relative">
+                <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
+                  placeholder="admin@meschool.edu"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-2">Password</label>
+              <div className="relative">
+                <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                <input 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 font-medium text-slate-800"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all flex items-center justify-center space-x-2"
+            >
+              <span>Access Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+
+          <div className="pt-4 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-400">Secure Institutional Login • Karachi Board Standard</p>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // Render Dynamic Content based on Sidebar Tabs
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -79,7 +169,7 @@ export default function App() {
               })}
             </div>
 
-            {/* Recent Activity & Quick Actions */}
+            {/* Recent Activity & Calendar */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
@@ -292,6 +382,7 @@ export default function App() {
     }
   };
 
+  // 2. MAIN ERP DASHBOARD SCREEN (Jab user login ho chuka ho)
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex font-sans">
       
@@ -342,17 +433,25 @@ export default function App() {
           </nav>
         </div>
 
-        {/* User Profile Footer */}
-        <div className="p-4 border-t border-slate-100">
+        {/* User Profile & Logout Footer */}
+        <div className="p-4 border-t border-slate-100 space-y-3">
           <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
             <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
               AK
             </div>
-            <div className="overflow-hidden">
+            <div className="overflow-hidden flex-1">
               <p className="text-sm font-semibold text-slate-900 truncate">Admin Khurram</p>
               <p className="text-xs text-slate-500 truncate">admin@meschool.edu</p>
             </div>
           </div>
+
+          <button 
+            onClick={() => setIsLoggedIn(false)}
+            className="w-full flex items-center justify-center space-x-2 text-rose-600 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-bold transition-all border border-rose-100"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out Session</span>
+          </button>
         </div>
       </aside>
 
