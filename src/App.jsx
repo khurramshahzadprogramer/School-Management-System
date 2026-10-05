@@ -6,25 +6,19 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('admin@meschool.edu');
   const [password, setPassword] = useState('admin123');
   const [loginError, setLoginError] = useState('');
 
-  // Dashboard Navigation State
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Interactive Students Data with LocalStorage Persistence
+  // Students with LocalStorage Persistence
   const [students, setStudents] = useState(() => {
-    const savedStudents = localStorage.getItem('meschool_students_v1');
-    if (savedStudents) {
-      try {
-        return JSON.parse(savedStudents);
-      } catch (e) {
-        console.error(e);
-      }
+    const saved = localStorage.getItem('meschool_students_v2');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
     return [
       { id: 'REG-2026-01', name: 'Ali Ahmed', grade: 'Grade 10 - A', status: 'Paid', contact: '+92 300 1234567' },
@@ -34,19 +28,17 @@ export default function App() {
     ];
   });
 
-  // Save to LocalStorage whenever students list changes
   useEffect(() => {
-    localStorage.setItem('meschool_students_v1', JSON.stringify(students));
+    localStorage.setItem('meschool_students_v2', JSON.stringify(students));
   }, [students]);
 
-  // Quick Admission Modal State
+  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStudentName, setNewStudentName] = useState('');
   const [newStudentGrade, setNewStudentGrade] = useState('Grade 10 - A');
   const [newStudentContact, setNewStudentContact] = useState('');
   const [newStudentStatus, setNewStudentStatus] = useState('Paid');
 
-  // Handle Login
   const handleLogin = (e) => {
     e.preventDefault();
     if (email && password) {
@@ -57,7 +49,6 @@ export default function App() {
     }
   };
 
-  // Handle Add Student
   const handleAddStudent = (e) => {
     e.preventDefault();
     if (newStudentName && newStudentContact) {
@@ -75,7 +66,6 @@ export default function App() {
     }
   };
 
-  // 1. LOGIN SCREEN
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
@@ -139,7 +129,6 @@ export default function App() {
     );
   }
 
-  // Render Dynamic Tabs
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -159,7 +148,7 @@ export default function App() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { title: 'Total Students', value: students.length + 2836, change: 'Live Synced', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                { title: 'Total Students', value: students.length + 2830, change: 'Live Synced', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
                 { title: 'Active Faculty', value: '148', change: 'Verified', icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                 { title: 'Fee Collection', value: '$92,450', change: '94%', icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
                 { title: 'Security Status', value: 'Secure', change: 'Active', icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -194,7 +183,7 @@ export default function App() {
               </div>
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
+                className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 cursor-pointer"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Add New Student</span>
@@ -233,19 +222,79 @@ export default function App() {
         );
 
       case 'teachers':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Faculty Management</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Faculty Management</h3>
+            <p className="text-sm text-slate-500">Active teachers, department assignments, and schedules.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              {['Sir Kamran Ahmed (Mathematics)', 'Madam Ayesha Khan (Physics)', 'Sir Tariq Jamil (Computer Science)'].map((t, i) => (
+                <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                  <h4 className="font-bold text-slate-800 text-sm">{t}</h4>
+                  <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded mt-2 inline-block">Active Duty</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
       case 'fees':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Fee Collection</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Fee Collection & Vouchers</h3>
+            <p className="text-sm text-slate-500">Track monthly tuitions, pending dues, and issue payment reminders.</p>
+            <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-indigo-600 uppercase">Total Collected This Month</span>
+                <h4 className="text-2xl font-bold text-slate-900">$92,450</h4>
+              </div>
+              <button className="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow">Generate Report</button>
+            </div>
+          </div>
+        );
+
       case 'attendance':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Attendance Logs</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Attendance Logs</h3>
+            <p className="text-sm text-slate-500">Daily student and staff attendance overview.</p>
+            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-sm font-medium">
+              ✅ Today's Overall School Attendance: <strong>96.4%</strong> (Present: 2,840 | Absent: 104)
+            </div>
+          </div>
+        );
+
       case 'academics':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Academics & Exams</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Academics & Term Exams</h3>
+            <p className="text-sm text-slate-500">Syllabus tracking, grading sheets, and examination timetables for 2026.</p>
+          </div>
+        );
+
       case 'transport':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Transport & Fleet</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Transport & Fleet Management</h3>
+            <p className="text-sm text-slate-500">School bus routes, driver contacts, and live GPS tracking status.</p>
+          </div>
+        );
+
       case 'library':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Library System</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Library System & Books</h3>
+            <p className="text-sm text-slate-500">Book inventory, issued copies, and student checkouts.</p>
+          </div>
+        );
+
       case 'notices':
-        return <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h3 className="text-xl font-bold">Notices & Events</h3></div>;
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Notices & Circulars</h3>
+            <p className="text-sm text-slate-500">Broadcast official announcements to parents and teachers.</p>
+          </div>
+        );
+
       default:
         return <div>Select tab</div>;
     }
@@ -283,7 +332,7 @@ export default function App() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer ${
                     isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
@@ -298,7 +347,7 @@ export default function App() {
         <div className="p-4 border-t border-slate-100 space-y-3">
           <button 
             onClick={() => setIsLoggedIn(false)}
-            className="w-full flex items-center justify-center space-x-2 text-rose-600 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-bold transition-all border border-rose-100"
+            className="w-full flex items-center justify-center space-x-2 text-rose-600 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-bold transition-all border border-rose-100 cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out Session</span>
@@ -322,7 +371,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="relative p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100">
+            <button className="relative p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer">
               <Bell className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
             </button>
@@ -350,7 +399,7 @@ export default function App() {
                 <h3 className="font-bold text-lg text-slate-900">Quick Student Admission</h3>
                 <p className="text-xs text-slate-500">Enter details to register a new student</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -410,13 +459,13 @@ export default function App() {
                 <button 
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 cursor-pointer"
                 >
                   Save Admission
                 </button>
